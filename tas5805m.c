@@ -1,4 +1,4 @@
-#define DEBUG
+// #define DEBUG
 // SPDX-License-Identifier: GPL-2.0
 //
 // Driver for the TAS5805M Audio Amplifier
@@ -516,7 +516,7 @@ MODULE_DEVICE_TABLE(i2c, tas5805m_i2c_id);
 
 #if IS_ENABLED(CONFIG_OF)
 static const struct of_device_id tas5805m_of_match[] = {
-	{ .compatible = "ti,tas5805m-new", },
+	{ .compatible = "ti,tas5805m", },
 	{ }
 };
 MODULE_DEVICE_TABLE(of, tas5805m_of_match);
@@ -527,7 +527,7 @@ static struct i2c_driver tas5805m_i2c_driver = {
 	.remove		= tas5805m_i2c_remove,
 	.id_table	= tas5805m_i2c_id,
 	.driver		= {
-		.name		= "tas5805m-new",
+		.name		= "tas5805m",
 		.of_match_table = of_match_ptr(tas5805m_of_match),
 	},
 };
