@@ -13,7 +13,7 @@
 //    https://e2e.ti.com/support/audio-group/audio/f/audio-forum/722027/linux-tas5825m-linux-drivers
 //
 // It has been simplified a little and reworked for the 5.x ALSA SoC API.
-// A minimal config for PVDD=24V is used.
+// This driver works with a binary firmware file. When missing or invalid a minimal config for PVDD=24V is used.
 
 #include <linux/module.h>
 #include <linux/moduleparam.h>
@@ -386,8 +386,10 @@ static int tas5805m_i2c_probe(struct i2c_client *i2c)
 	struct tas5805m_priv *tas5805m;
 	char filename[128];
 	const char *config_name;
-	const struct firmware *fw;
+	const char *config_rate[3] = {"88.2kHz", "96kHz", "192kHz"};
+	const struct firmware *fw[2];
 	int ret;
+	int i;
 
 	regmap = devm_regmap_init_i2c(i2c, &tas5805m_regmap);
 	if (IS_ERR(regmap)) {
@@ -425,31 +427,34 @@ static int tas5805m_i2c_probe(struct i2c_client *i2c)
 	 * The fixed portion of PPC3's output prior to the 5ms delay
 	 * should be omitted.
 	 */
-	if (device_property_read_string(dev, "ti,dsp-config-name",
+	tas5805m->firmware_valid = 0x00;
+	for (i = 0; i < 3 ; i++) {
+
+		if (device_property_read_string(dev, "ti,dsp-config-name",
 					&config_name))
-		config_name = "default";
+			config_name = "default";
 
-	snprintf(filename, sizeof(filename), "tas5805m_dsp_%s.bin",
-		 config_name);
-	ret = request_firmware(&fw, filename, dev);
-	if (ret)
-		return ret;
+		snprintf(filename, sizeof(filename), "tas5805m_dsp_%s_%s.bin",
+			config_name,config_rate[i]);
+		ret = request_firmware(&fw[i], filename, dev);
 
-	if ((fw->size < 2) || (fw->size & 1)) {
-		dev_err(dev, "firmware is invalid\n");
-		release_firmware(fw);
-		return -EINVAL;
+		if (!ret) {		
+		tas5805m->dsp_cfg_len[i] = fw[i]->size;
+		tas5805m->dsp_cfg_data[i] = devm_kmalloc(dev, fw[i]->size, GFP_KERNEL);
+			if (!tas5805m->dsp_cfg_data[i]) {
+				dev_err(dev, "firmware is not loaded, using minimal %s config for PVDD=24V\n", config_rate[i]);
+			}
+			if ((fw[i]->size < 2) || (fw[i]->size & 1)) {
+				dev_err(dev, "firmware is invalid, using minimal %s config for PVDD=24V\n", config_rate[i]);
+			} else {
+			memcpy(tas5805m->dsp_cfg_data[i], fw[i]->data, fw[i]->size);
+			tas5805m->firmware_valid += 1<<i;
+			}
+		release_firmware(fw[i]);
+		} else {
+			dev_err(dev, "firmware not found, using minimal %s config for PVDD=24V\n", config_rate[i]);
+		}
 	}
-
-	tas5805m->dsp_cfg_len[0] = fw->size;
-	tas5805m->dsp_cfg_data[0] = devm_kmalloc(dev, fw->size, GFP_KERNEL);
-	if (!tas5805m->dsp_cfg_data[0]) {
-		release_firmware(fw);
-		return -ENOMEM;
-	}
-	memcpy(tas5805m->dsp_cfg_data[0], fw->data, fw->size);
-
-	release_firmware(fw);
 
 	/* Do the first part of the power-on here, while we can expect
 	 * the I2S interface to be quiet. We must raise PDN# and then
