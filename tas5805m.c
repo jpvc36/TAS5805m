@@ -13,6 +13,7 @@
 //    https://e2e.ti.com/support/audio-group/audio/f/audio-forum/722027/linux-tas5825m-linux-drivers
 //
 // It has been simplified a little and reworked for the 5.x ALSA SoC API.
+// A minimal config for PVDD=24V is used.
 
 #include <linux/module.h>
 #include <linux/moduleparam.h>
@@ -34,6 +35,7 @@
 
 /* Datasheet-defined registers on page 0, book 0 */
 #define REG_PAGE		0x00
+#define REG_RESET_CTRL		0x01
 #define REG_DEVICE_CTRL_1	0x02
 #define REG_DEVICE_CTRL_2	0x03
 #define REG_SIG_CH_CTRL		0x28
@@ -60,22 +62,21 @@
 #define DCTRL2_MUTE		0x08
 #define DCTRL2_DIS_DSP		0x10
 
+/* REG_FAULT register values */
+#define ANALOG_FAULT_CLEAR	0x80
+
+/* PPC3 commands */
+#define CFG_META_DELAY		0xfe
+#define CFG_META_BURST		0xfd
+#define CFG_ASCII_TEXT		0xf0
+
 #define TAS5805M_RATES		(SNDRV_PCM_RATE_32000 | SNDRV_PCM_RATE_44100 |\
 				SNDRV_PCM_RATE_48000 | SNDRV_PCM_RATE_88200 |\
-				SNDRV_PCM_RATE_96000 | SNDRV_PCM_RATE_176400 |\
+				SNDRV_PCM_RATE_96000 | SNDRV_PCM_RATE_176400 | \
 				SNDRV_PCM_RATE_192000)
 
 #define TAS5805M_FORMATS	(SNDRV_PCM_FMTBIT_S16_LE | SNDRV_PCM_FMTBIT_S20_3LE |\
 				SNDRV_PCM_FMTBIT_S24_LE | SNDRV_PCM_FMTBIT_S32_LE)
-
-/* This sequence of register writes must always be sent, prior to the
- * 5ms delay while we wait for the DSP to boot.
- */
-static const uint8_t dsp_cfg_preboot[] = {
-	0x00, 0x00, 0x7f, 0x00, 0x03, 0x02, 0x01, 0x11,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x7f, 0x00, 0x03, 0x02,
-};
 
 static const uint32_t tas5805m_volume[] = {
 	0x0000001B, /*   0, -110dB */ 0x0000001E, /*   1, -109dB */
@@ -162,6 +163,19 @@ static const uint32_t tas5805m_volume[] = {
 
 #define TAS5805M_VOLUME_MAX	((int)ARRAY_SIZE(tas5805m_volume) - 1)
 #define TAS5805M_VOLUME_MIN	0
+
+/* This sequence of register writes also takes care of the
+ * 5ms delay while we wait for the DSP to boot.
+ */
+static const uint8_t firmware_missing[] = {
+	REG_PAGE,		0x00,
+	REG_BOOK,		0x00,
+	REG_DEVICE_CTRL_2,	0x02,
+	REG_RESET_CTRL,		0x10,
+	CFG_META_DELAY,		0x05,
+	REG_AGAIN,		0x03,
+	REG_FAULT,		0x80,
+};
 
 struct tas5805m_priv {
 	struct i2c_client		*i2c;
@@ -297,13 +311,33 @@ static const struct snd_kcontrol_new tas5805m_snd_controls[] = {
 	},
 };
 
+/* Delay while we wait for the DSP to boot,
+ * bursts of data and explanatory text in the firmware.
+ */
 static void send_cfg(struct regmap *rm,
-		     const uint8_t *s, unsigned int len)
+		const uint8_t *s, unsigned int len)
 {
-	unsigned int i;
-
-	for (i = 0; i + 1 < len; i += 2)
-		regmap_write(rm, s[i], s[i + 1]);
+	unsigned int i = 0;
+	while (i < len) {
+		switch (s[i]) {
+		case CFG_META_DELAY:
+			usleep_range((1000 * s[i + 1]), (1000 * s[i + 1]) + 10000);
+			i++;
+			break;
+		case CFG_META_BURST:
+			regmap_bulk_write(rm, s[i + 2], &s[i + 3], s[i + 1] - 1);
+			i +=  s[i + 1];
+			break;
+		case CFG_ASCII_TEXT:				// skip n = s[i + 1] - 1 ascii characters
+			i +=  s[i + 1];
+			break;
+		default:
+			regmap_write(rm, s[i], s[i + 1]);
+			i++;
+			break;
+		}
+		i++;
+	}
 }
 
 /* The TAS5805M DSP can't be configured until the I2S clock has been
@@ -352,9 +386,7 @@ static void do_work(struct work_struct *work)
 	 * allow the DSP to boot before configuring it.
 	 */
 	usleep_range(5000, 10000);
-	send_cfg(rm, dsp_cfg_preboot, ARRAY_SIZE(dsp_cfg_preboot));
-	usleep_range(5000, 15000);
-	send_cfg(rm, tas5805m->dsp_cfg_data, tas5805m->dsp_cfg_len);
+	send_cfg(rm, firmware_missing, ARRAY_SIZE(firmware_missing));
 
 	tas5805m->is_powered = true;
 	tas5805m_refresh(tas5805m);
