@@ -5,6 +5,7 @@
 //
 // Author: Andy Liu <andy-liu@ti.com>
 // Author: Daniel Beer <daniel.beer@igorinstitute.com>
+// Author: J.P. van Coolwijk <jpvc36@gmail.com>
 //
 // This is based on a driver originally written by Andy Liu at TI and
 // posted here:
@@ -58,6 +59,14 @@
 
 #define DCTRL2_MUTE		0x08
 #define DCTRL2_DIS_DSP		0x10
+
+#define TAS5805M_RATES		(SNDRV_PCM_RATE_32000 | SNDRV_PCM_RATE_44100 |\
+				SNDRV_PCM_RATE_48000 | SNDRV_PCM_RATE_88200 |\
+				SNDRV_PCM_RATE_96000 | SNDRV_PCM_RATE_176400 |\
+				SNDRV_PCM_RATE_192000)
+
+#define TAS5805M_FORMATS	(SNDRV_PCM_FMTBIT_S16_LE | SNDRV_PCM_FMTBIT_S20_3LE |\
+				SNDRV_PCM_FMTBIT_S24_LE | SNDRV_PCM_FMTBIT_S32_LE)
 
 /* This sequence of register writes must always be sent, prior to the
  * 5ms delay while we wait for the DSP to boot.
@@ -443,8 +452,8 @@ static struct snd_soc_dai_driver tas5805m_dai = {
 		.stream_name	= "Playback",
 		.channels_min	= 2,
 		.channels_max	= 2,
-		.rates		= SNDRV_PCM_RATE_48000,
-		.formats	= SNDRV_PCM_FMTBIT_S32_LE,
+		.rates		= TAS5805M_RATES,
+		.formats	= TAS5805M_FORMATS,
 	},
 	.ops		= &tas5805m_dai_ops,
 };
