@@ -353,6 +353,7 @@ static const struct snd_soc_dai_ops tas5805m_dai_ops = {
 	.trigger		= tas5805m_trigger,
 	.hw_params		= tas5805m_hw_params,
 	.mute_stream		= tas5805m_mute,
+	.no_capture_mute	= 1,
 };
 
 static struct snd_soc_dai_driver tas5805m_dai = {
