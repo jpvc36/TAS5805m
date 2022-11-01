@@ -209,51 +209,51 @@ static void do_work(struct work_struct *work)
 	 * allow the DSP to boot before configuring it.
 	 */
 	usleep_range(5000, 10000);
-		dev_dbg(&tas5805m->i2c->dev, "firmware_valid=%d\n",
+	dev_dbg(&tas5805m->i2c->dev, "firmware_valid=%d\n",
 			tas5805m->firmware_valid);
-		switch (tas5805m->rate) {
+	switch (tas5805m->rate) {
 
-			case 44100:
-			case 88200:
-				if (tas5805m->firmware_valid && 1<<0) {
-					dev_dbg(&tas5805m->i2c->dev,
-						"sample rate = %d Hz, firmware for DSP 88.2 kHz\n", tas5805m->rate);
-					send_cfg(rm, tas5805m->dsp_cfg_data[0],
-						tas5805m->dsp_cfg_len[0]);
-				} else {
-					dev_dbg(&tas5805m->i2c->dev,
-						"sample rate = %d Hz, no firmware loaded\n", tas5805m->rate);
-					send_minimal_cfg(rm);	
-				}
-				break;
-
-			case 32000:
-			case 48000:
-			case 96000:
-				if (tas5805m->firmware_valid && 1<<1) {
-					dev_dbg(&tas5805m->i2c->dev,
-						"sample rate = %d Hz, firmware for DSP 96 kHz\n", tas5805m->rate);
-				send_cfg(rm, tas5805m->dsp_cfg_data[1], tas5805m->dsp_cfg_len[1]);
-				} else {
-					dev_dbg(&tas5805m->i2c->dev,
-						"sample rate = %d Hz, no firmware loaded\n", tas5805m->rate);
-					send_minimal_cfg(rm);	
- 				}
- 				break;
-
-			case 176400:
-			case 192000:
-				if (tas5805m->firmware_valid && 1<<2) {
-					dev_err(&tas5805m->i2c->dev,
-						"sample rate = %d Hz, firmware for 176.4 / 192 kHz without DSP\n", tas5805m->rate);
-				send_cfg(rm, tas5805m->dsp_cfg_data[2], tas5805m->dsp_cfg_len[2]);
-				} else {
-					dev_dbg(&tas5805m->i2c->dev,
-						"sample rate = %d Hz, no firmware loaded\n", tas5805m->rate);
-					send_cfg(rm, firmware_missing, ARRAY_SIZE(firmware_missing));
-				}
-				break;
+		case 44100:
+		case 88200:
+			if (tas5805m->firmware_valid && 1<<0) {
+				dev_dbg(&tas5805m->i2c->dev,
+					"sample rate = %d Hz, firmware for DSP 88.2 kHz\n", tas5805m->rate);
+				send_cfg(rm, tas5805m->dsp_cfg_data[0],
+					tas5805m->dsp_cfg_len[0]);
+			} else {
+				dev_dbg(&tas5805m->i2c->dev,
+					"sample rate = %d Hz, no firmware loaded\n", tas5805m->rate);
+				send_minimal_cfg(rm);	
 			}
+			break;
+
+		case 32000:
+		case 48000:
+		case 96000:
+			if (tas5805m->firmware_valid && 1<<1) {
+				dev_dbg(&tas5805m->i2c->dev,
+					"sample rate = %d Hz, firmware for DSP 96 kHz\n", tas5805m->rate);
+			send_cfg(rm, tas5805m->dsp_cfg_data[1], tas5805m->dsp_cfg_len[1]);
+			} else {
+				dev_dbg(&tas5805m->i2c->dev,
+					"sample rate = %d Hz, no firmware loaded\n", tas5805m->rate);
+				send_minimal_cfg(rm);	
+			}
+			break;
+
+		case 176400:
+		case 192000:
+			if (tas5805m->firmware_valid && 1<<2) {
+				dev_err(&tas5805m->i2c->dev,
+					"sample rate = %d Hz, firmware for 176.4 / 192 kHz without DSP\n", tas5805m->rate);
+			send_cfg(rm, tas5805m->dsp_cfg_data[2], tas5805m->dsp_cfg_len[2]);
+			} else {
+				dev_dbg(&tas5805m->i2c->dev,
+					"sample rate = %d Hz, no firmware loaded\n", tas5805m->rate);
+				send_cfg(rm, firmware_missing, ARRAY_SIZE(firmware_missing));
+			}
+			break;
+	}
 	tas5805m->is_powered = true;
 	tas5805m_refresh(tas5805m);
 	mutex_unlock(&tas5805m->lock);
@@ -431,7 +431,7 @@ static int tas5805m_i2c_probe(struct i2c_client *i2c)
 
 	for (i = 0; i < 3 ; i++) {
 		snprintf(filename, sizeof(filename), "tas5805m_dsp_%s_%s.bin",
-			config_name,config_rate[i]);
+			config_name, config_rate[i]);
 		ret = request_firmware(&fw[i], filename, dev);
 
 		if (!ret) {		
