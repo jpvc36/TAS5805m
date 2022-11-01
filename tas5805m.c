@@ -425,12 +425,11 @@ static int tas5805m_i2c_probe(struct i2c_client *i2c)
 	 * are register values. See PPC3 output for more options.
 	 */
 	tas5805m->firmware_valid = 0x00;
+	if (device_property_read_string(dev, "ti,dsp-config-name",
+				&config_name))
+		config_name = "default";
+
 	for (i = 0; i < 3 ; i++) {
-
-		if (device_property_read_string(dev, "ti,dsp-config-name",
-					&config_name))
-			config_name = "default";
-
 		snprintf(filename, sizeof(filename), "tas5805m_dsp_%s_%s.bin",
 			config_name,config_rate[i]);
 		ret = request_firmware(&fw[i], filename, dev);
