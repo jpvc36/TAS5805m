@@ -432,7 +432,7 @@ static int tas5805m_i2c_probe(struct i2c_client *i2c)
 	for (i = 0; i < 3 ; i++) {
 		snprintf(filename, sizeof(filename), "tas5805m_dsp_%s_%s.bin",
 			config_name, config_rate[i]);
-		ret = request_firmware(&fw[i], filename, dev);
+		ret = request_firmware_direct(&fw[i], filename, dev);
 
 		if (!ret) {		
 		tas5805m->dsp_cfg_len[i] = fw[i]->size;
