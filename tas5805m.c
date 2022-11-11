@@ -387,7 +387,7 @@ static int tas5805m_i2c_probe(struct i2c_client *i2c)
 	char filename[128];
 	const char *config_name;
 	const char *config_rate[3] = {"88.2kHz", "96kHz", "192kHz"};
-	const struct firmware *fw[2];
+	const struct firmware *fw[3];
 	int ret;
 	int i;
 
