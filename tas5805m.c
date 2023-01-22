@@ -77,6 +77,7 @@
 				SNDRV_PCM_RATE_192000)
 
 #define TAS5805M_FORMATS	(SNDRV_PCM_FMTBIT_S16_LE | SNDRV_PCM_FMTBIT_S20_3LE |\
+				SNDRV_PCM_FMTBIT_S24_3LE |\
 				SNDRV_PCM_FMTBIT_S24_LE | SNDRV_PCM_FMTBIT_S32_LE)
 
 /* This sequence of register writes also takes care of the
