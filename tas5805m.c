@@ -436,14 +436,13 @@ static int tas5805m_i2c_probe(struct i2c_client *i2c)
 
 		if (!ret) {		
 		tas5805m->dsp_cfg_len[i] = fw[i]->size;
-		tas5805m->dsp_cfg_data[i] = devm_kmalloc(dev, fw[i]->size, GFP_KERNEL);
+		tas5805m->dsp_cfg_data[i] = devm_kmemdup(dev, fw[i]->data, fw[i]->size, GFP_KERNEL);
 			if (!tas5805m->dsp_cfg_data[i]) {
 				dev_err(dev, "firmware is not loaded, using minimal %s config for PVDD=24V\n", config_rate[i]);
 			}
 			if ((fw[i]->size < 2) || (fw[i]->size & 1)) {
 				dev_err(dev, "firmware is invalid, using minimal %s config for PVDD=24V\n", config_rate[i]);
 			} else {
-			memcpy(tas5805m->dsp_cfg_data[i], fw[i]->data, fw[i]->size);
 			tas5805m->firmware_valid += 1<<i;
 			}
 		release_firmware(fw[i]);
