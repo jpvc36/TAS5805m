@@ -1,0 +1,66 @@
+// dtc -@ -I dts -O dtb -o tas5805m.dtbo tas5805m-Armbian.dts
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "allwinner,sun8i-h3";
+
+        fragment@0 {
+                target = <&i2c0>;
+                __overlay__ {
+                        #address-cells = <1>;
+                        #size-cells = <0>;
+                        status = "okay";
+
+                        tas5805m: tas5805m@reg{
+                                compatible = "ti,tas5805m";
+                                reg = <0x2c>;
+                                ti,shared-lrclk;
+                                #sound-dai-cells = <0>;
+				pvdd-supply = <&reg_vcc5v0>;
+/*				pdn-gpios = <&pio 0 6 0>;*/ /* PA6: CON2-P07 */
+				pdn-gpios = <&pio 0 1 0>; /* PA1: CON2-P11 */
+				ti,dsp-config-name = "default";
+                        };
+                };
+        };
+
+	fragment@1 {
+		target = <&i2s0>;
+		__overlay__ {
+			status = "okay";
+			pinctrl-0 = <&i2s0_pins>;
+			sound-dai = <&tas5805m>;
+			pinctrl-names = "default";
+		};
+	};
+
+	fragment@2 {
+		target-path = "/";
+		__overlay__ {
+			sound_i2s {
+				compatible = "simple-audio-card";
+				simple-audio-card,name = "AmpliMuseAmp";
+				simple-audio-card,mclk-fs = <256>;
+				simple-audio-card,format = "i2s";
+		                status = "okay";
+
+				simple-audio-card,cpu {
+					sound-dai = <&i2s0>;
+				};
+
+				simple-audio-card,codec {
+					sound-dai = <&tas5805m>;
+				};
+			};
+		};
+	};
+
+	fragment@4 {
+		target = <&i2s2>;
+		__overlay__ {
+			status = "disabled";		
+		};
+	};
+
+};
