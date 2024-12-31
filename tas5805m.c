@@ -45,6 +45,8 @@
 #define REG_BCK_MON		0x38
 #define REG_CLKDET_STATUS	0x39
 #define REG_VOL_CTL		0x4c
+#define REG_DIG_VOL_LEFT	0x4c
+#define REG_DIG_VOL_RIGHT	0x4d
 #define REG_AGAIN		0x54
 #define REG_ADR_PIN_CTRL	0x60
 #define REG_ADR_PIN_CONFIG	0x61
@@ -127,7 +129,8 @@ static void tas5805m_refresh(struct tas5805m_priv *tas5805m)
 
 static const SNDRV_CTL_TLVD_DECLARE_DB_SCALE(tas5805m_vol_tlv, -10350, 50, 1);
 static const struct snd_kcontrol_new tas5805m_snd_controls[] = {
-	SOC_SINGLE_TLV	("Master Playback Volume", REG_VOL_CTL, 0, 255, 1, tas5805m_vol_tlv),
+//	SOC_SINGLE_TLV	("Master Playback Volume", REG_VOL_CTL, 0, 255, 1, tas5805m_vol_tlv),
+	SOC_DOUBLE_R_TLV ("Master Playback Volume", REG_DIG_VOL_LEFT, REG_DIG_VOL_RIGHT, 0, 255, 1, tas5805m_vol_tlv),
 };
 
 /* Delay while we wait for the DSP to boot,
