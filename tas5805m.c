@@ -525,6 +525,7 @@ static void tas5805m_i2c_remove(struct i2c_client *i2c)
 	cancel_work_sync(&tas5805m->work);
 	snd_soc_unregister_component(dev);
 	gpiod_set_value(tas5805m->gpio_pdn_n, 0);
+        gpiod_set_value(tas5805m->gpio_bias_monitor, 0);
 	usleep_range(10000, 15000);
 	regulator_disable(tas5805m->pvdd);
 }
