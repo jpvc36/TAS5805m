@@ -325,6 +325,21 @@ static int tas5805m_set_bias_level(struct snd_soc_component *component,
             gpiod_set_value(tas5805m->gpio_bias_monitor, 0);
     }
 
+    // Notify userspace with custom env
+    const char *bias_str = NULL;
+    switch (level) {
+    case SND_SOC_BIAS_OFF: bias_str = "BIAS_LEVEL=OFF"; break;
+    case SND_SOC_BIAS_STANDBY: bias_str = "BIAS_LEVEL=STANDBY"; break;
+    case SND_SOC_BIAS_ON: bias_str = "BIAS_LEVEL=ON"; break;
+    case SND_SOC_BIAS_PREPARE: bias_str = "BIAS_LEVEL=PREPARE"; break;
+    }
+
+    if (bias_str) {
+        char *envp[] = { (char *)bias_str, NULL };
+        kobject_uevent_env(&component->dev->kobj, KOBJ_CHANGE, envp);
+        dev_dbg(component->dev, "%s\n", bias_str);
+    }
+
     return 0;
 }
 
