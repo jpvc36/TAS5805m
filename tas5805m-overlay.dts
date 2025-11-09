@@ -20,7 +20,7 @@
         target = <&i2c1>;
         __overlay__ {
             status = "okay";
-            clock-frequency = <100000>;
+            clock-frequency = <400000>;
             #address-cells = <1>;
             #size-cells = <0>;
 
@@ -62,5 +62,6 @@
     __overrides__ {
             firmware = <&codec>,"ti,dsp-config-name";  
             i2creg = <&codec>,"reg:<>";
+            i2cspeed = <&i2c1>, "clock-frequency:0";
     };
 };
