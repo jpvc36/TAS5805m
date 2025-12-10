@@ -147,13 +147,15 @@ static int tas5805m_set_mute(struct snd_kcontrol *kcontrol,
 		snd_soc_component_get_drvdata(component);
 	bool mute = ucontrol->value.integer.value[0];
 
+	int changed = (mute != tas5805m->is_muted);
+
 	mutex_lock(&tas5805m->lock);
 	tas5805m->is_muted = mute;
 	if (tas5805m->is_powered)
 		tas5805m_refresh(tas5805m);
 	mutex_unlock(&tas5805m->lock);
 
-	return 0;
+	return changed;
 }
 
 static const SNDRV_CTL_TLVD_DECLARE_DB_SCALE(tas5805m_vol_tlv, -10350, 50, 1);
