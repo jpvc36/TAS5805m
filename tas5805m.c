@@ -128,10 +128,39 @@ static void tas5805m_refresh(struct tas5805m_priv *tas5805m)
 		DCTRL2_MODE_PLAY);
 }
 
+static int tas5805m_get_mute(struct snd_kcontrol *kcontrol,
+			     struct snd_ctl_elem_value *ucontrol)
+{
+	struct snd_soc_component *component = snd_kcontrol_chip(kcontrol);
+	struct tas5805m_priv *tas5805m =
+		snd_soc_component_get_drvdata(component);
+
+	ucontrol->value.integer.value[0] = tas5805m->is_muted;
+	return 0;
+}
+
+static int tas5805m_set_mute(struct snd_kcontrol *kcontrol,
+			     struct snd_ctl_elem_value *ucontrol)
+{
+	struct snd_soc_component *component = snd_kcontrol_chip(kcontrol);
+	struct tas5805m_priv *tas5805m =
+		snd_soc_component_get_drvdata(component);
+	bool mute = ucontrol->value.integer.value[0];
+
+	mutex_lock(&tas5805m->lock);
+	tas5805m->is_muted = mute;
+	if (tas5805m->is_powered)
+		tas5805m_refresh(tas5805m);
+	mutex_unlock(&tas5805m->lock);
+
+	return 0;
+}
+
 static const SNDRV_CTL_TLVD_DECLARE_DB_SCALE(tas5805m_vol_tlv, -10350, 50, 1);
 static const struct snd_kcontrol_new tas5805m_snd_controls[] = {
 //	SOC_SINGLE_TLV	("Master Playback Volume", REG_VOL_CTL, 0, 255, 1, tas5805m_vol_tlv),
 	SOC_DOUBLE_R_TLV ("Master Playback Volume", REG_DIG_VOL_LEFT, REG_DIG_VOL_RIGHT, 0, 255, 1, tas5805m_vol_tlv),
+	SOC_SINGLE_BOOL_EXT("Master Playback Switch", 0, tas5805m_get_mute, tas5805m_set_mute),
 };
 
 /* Delay while we wait for the DSP to boot,
