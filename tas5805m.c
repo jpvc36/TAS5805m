@@ -135,7 +135,7 @@ static int tas5805m_get_mute(struct snd_kcontrol *kcontrol,
 	struct tas5805m_priv *tas5805m =
 		snd_soc_component_get_drvdata(component);
 
-	ucontrol->value.integer.value[0] = tas5805m->is_muted;
+	ucontrol->value.integer.value[0] = !tas5805m->is_muted;
 	return 0;
 }
 
@@ -145,7 +145,7 @@ static int tas5805m_set_mute(struct snd_kcontrol *kcontrol,
 	struct snd_soc_component *component = snd_kcontrol_chip(kcontrol);
 	struct tas5805m_priv *tas5805m =
 		snd_soc_component_get_drvdata(component);
-	bool mute = ucontrol->value.integer.value[0];
+	bool mute = !ucontrol->value.integer.value[0];
 
 	int changed = (mute != tas5805m->is_muted);
 
