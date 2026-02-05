@@ -160,8 +160,8 @@ static int tas5805m_set_mute(struct snd_kcontrol *kcontrol,
 
 static const SNDRV_CTL_TLVD_DECLARE_DB_SCALE(tas5805m_vol_tlv, -10350, 50, 1);
 static const struct snd_kcontrol_new tas5805m_snd_controls[] = {
-//	SOC_SINGLE_TLV	("Master Playback Volume", REG_VOL_CTL, 0, 255, 1, tas5805m_vol_tlv),
-	SOC_DOUBLE_R_TLV ("Master Playback Volume", REG_DIG_VOL_LEFT, REG_DIG_VOL_RIGHT, 0, 255, 1, tas5805m_vol_tlv),
+	SOC_SINGLE_TLV	("Master Playback Volume", REG_VOL_CTL, 0, 255, 1, tas5805m_vol_tlv),
+//	SOC_DOUBLE_R_TLV ("Master Playback Volume", REG_DIG_VOL_LEFT, REG_DIG_VOL_RIGHT, 0, 255, 1, tas5805m_vol_tlv),
 	SOC_SINGLE_BOOL_EXT("Master Playback Switch", 0, tas5805m_get_mute, tas5805m_set_mute),
 };
 
@@ -604,5 +604,6 @@ module_i2c_driver(tas5805m_i2c_driver);
 
 MODULE_AUTHOR("Andy Liu <andy-liu@ti.com>");
 MODULE_AUTHOR("Daniel Beer <daniel.beer@igorinstitute.com>");
+MODULE_AUTHOR("J.P. van Coolwijk <jpvc36@gmail.com>");
 MODULE_DESCRIPTION("TAS5805M Audio Amplifier Driver");
 MODULE_LICENSE("GPL v2");
