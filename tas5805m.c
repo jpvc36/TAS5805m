@@ -469,13 +469,22 @@ static int tas5805m_i2c_probe(struct i2c_client *i2c)
 		return -ENOMEM;
 
 	tas5805m->i2c = i2c;
+/*	
 	tas5805m->pvdd = devm_regulator_get(dev, "pvdd");
 	if (IS_ERR(tas5805m->pvdd)) {
 		dev_err(dev, "failed to get pvdd supply: %ld\n",
 			PTR_ERR(tas5805m->pvdd));
 		return PTR_ERR(tas5805m->pvdd);
 	}
-
+*/
+	tas5805m->pvdd = devm_regulator_get_optional(dev, "pvdd");
+	if (IS_ERR(tas5805m->pvdd)) {
+		if (PTR_ERR(tas5805m->pvdd) == -ENODEV)
+			tas5805m->pvdd = NULL;
+		else
+			return PTR_ERR(tas5805m->pvdd);
+	}
+	
 	dev_set_drvdata(dev, tas5805m);
 	tas5805m->regmap = regmap;
 	tas5805m->gpio_pdn_n = devm_gpiod_get_optional(dev, "pdn", GPIOD_OUT_LOW);
