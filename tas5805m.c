@@ -575,7 +575,7 @@ static int tas5805m_i2c_probe(struct i2c_client *i2c)
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
 static void tas5805m_i2c_remove(struct i2c_client *i2c)
 #else
-int tas5805m_i2c_remove(struct i2c_client *i2c)
+static int tas5805m_i2c_remove(struct i2c_client *i2c)
 #endif
 {
         struct device *dev = &i2c->dev;
