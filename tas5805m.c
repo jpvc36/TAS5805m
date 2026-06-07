@@ -348,6 +348,7 @@ static const struct snd_soc_dapm_widget tas5805m_dapm_widgets[] = {
 static int tas5805m_set_bias_level(struct snd_soc_component *component,
                                    enum snd_soc_bias_level level)
 {
+    const char *bias_str = NULL;
     struct tas5805m_priv *tas5805m = snd_soc_component_get_drvdata(component);
 
     if (tas5805m->gpio_bias_monitor) {
@@ -358,7 +359,6 @@ static int tas5805m_set_bias_level(struct snd_soc_component *component,
     }
 
     // Notify userspace with custom env
-    const char *bias_str = NULL;
     switch (level) {
     case SND_SOC_BIAS_OFF: bias_str = "BIAS_LEVEL=OFF"; break;
     case SND_SOC_BIAS_STANDBY: bias_str = "BIAS_LEVEL=STANDBY"; break;
