@@ -28,6 +28,7 @@
 #include <linux/regulator/consumer.h>
 #include <linux/atomic.h>
 #include <linux/workqueue.h>
+#include <linux/version.h>
 
 #include <sound/soc.h>
 #include <sound/pcm.h>
