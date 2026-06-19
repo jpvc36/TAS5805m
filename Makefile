@@ -1,9 +1,21 @@
 obj-m += tas5805m.o
 
+KERNEL := /lib/modules/$(shell uname -r)/build
+CROSS_COMPILE :=
+TARGET_ARCH := $(shell uname -m)
+
+ifeq ($(ARCH),arm64)
+    CROSS_COMPILE := aarch64-linux-gnu-
+    TARGET_ARCH := arm64
+else ifeq ($(ARCH),aarch64)
+    CROSS_COMPILE := aarch64-linux-gnu-
+    TARGET_ARCH := arm64
+else ifeq ($(ARCH),arm)
+    CROSS_COMPILE := arm-linux-gnueabihf-
+    TARGET_ARCH := arm
+endif
+
 all:
-	make -j$$(nproc) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C ../ M=$$PWD modules
-	#make -j$(nproc) ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -C ~/rpi-linux_6.1.77/ M=`pwd` modules
-	#make -C /lib/modules/`uname -r`/build M=`pwd` modules
+	make -j$(shell nproc) ARCH=$(TARGET_ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C $(KERNEL) M=$(shell pwd) modules
 clean:
-	make -j$$(nproc) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C ../ M=$$PWD clean
-	#make -j$(nproc) ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -C ~/rpi-linux_6.1.77/ M=`pwd` clean
+	make -j$(shell nproc) ARCH=$(TARGET_ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C $(KERNEL) M=$(shell pwd) clean
