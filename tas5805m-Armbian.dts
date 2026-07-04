@@ -1,4 +1,5 @@
 // dtc -@ -I dts -O dtb -o tas5805m.dtbo tas5805m-Armbian.dts
+// I2S: LR pin28, BCK pin27, DIN pin40
 /dts-v1/;
 /plugin/;
 
