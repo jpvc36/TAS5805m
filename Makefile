@@ -2,7 +2,7 @@ obj-m += tas5805m.o
 
 KERNEL := /lib/modules/$(shell uname -r)/build
 CROSS_COMPILE :=
-TARGET_ARCH := $(shell uname -m)
+ARCH := $(shell uname -m)
 
 ifeq ($(ARCH),arm64)
     CROSS_COMPILE := aarch64-linux-gnu-
