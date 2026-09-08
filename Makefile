@@ -13,6 +13,9 @@ else ifeq ($(ARCH),aarch64)
 else ifeq ($(ARCH),arm)
     CROSS_COMPILE := arm-linux-gnueabihf-
     TARGET_ARCH := arm
+else ifeq ($(ARCH),armv7l)
+    CROSS_COMPILE := arm-linux-gnueabihf-
+    TARGET_ARCH := arm
 endif
 
 all:
