@@ -1,5 +1,6 @@
 config BR2_PACKAGE_TAS5805M
         bool "tas5805m kernel module"
         depends on BR2_LINUX_KERNEL
+        select BR2_PACKAGE_ALSA_UTILS
         help
                 Linux Kernel Module Cheat.
