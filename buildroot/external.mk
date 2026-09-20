@@ -1,5 +1,5 @@
 TAS5805M_VERSION = main
-TAS5805M_SITE = https://githubusercontent.com
+TAS5805M_SITE = https://raw.githubusercontent.com/jpvc36/TAS5805m/refs/heads/
 TAS5805M_SOURCE = tas5805m.c
 TAS5805M_SITE_METHOD = wget
 
