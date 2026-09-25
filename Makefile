@@ -1,4 +1,6 @@
 obj-m += tas5805m.o
+obj-m += simple-card.o
+obj-m += simple-card-utils.o
 
 KERNEL := /lib/modules/$(shell uname -r)/build
 CROSS_COMPILE :=
