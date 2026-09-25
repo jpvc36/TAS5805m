@@ -16,8 +16,10 @@ define KernelPackage/tas5805m
   SUBMENU:=Sound Support
   TITLE:=TAS58xx driver
   DEPENDS:= kmod-i2c-bcm2835 kmod-regmap-i2c kmod-sound-soc-bcm2835-i2s kmod-sound-soc-core
-  FILES:=$(PKG_BUILD_DIR)/tas5805m.ko
-  AUTOLOAD:=$(call AutoLoad,68,tas5805m)
+  FILES:=$(PKG_BUILD_DIR)/tas5805m.ko \
+        $(PKG_BUILD_DIR)/simple-card.ko \
+        $(PKG_BUILD_DIR)/simple-card-utils.ko
+  AUTOLOAD:=$(call AutoLoad,68,tas5805m simple-card simple-card-utils)
 endef
 
 EXTRA_KCONFIG:=
