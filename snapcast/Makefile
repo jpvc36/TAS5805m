@@ -23,7 +23,7 @@ include $(INCLUDE_DIR)/cmake.mk
 
 CMAKE_OPTIONS += \
     -DBUILD_TESTS=OFF \
-    -DBUILD_WITH_AVAHI=OFF \
+    -DBUILD_WITH_AVAHI=ON \
     -DBUILD_WITH_PULSE=OFF
 
 define Package/snapcast/Default
@@ -40,7 +40,8 @@ define Package/snapcast/Default
     +libogg \
     +libopus \
     +libopenssl \
-    +libsoxr
+    +libsoxr \
+    +libavahi-client
 #  URL:=https://github.com/snapcast/snapcast
 endef
 
