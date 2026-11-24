@@ -588,7 +588,7 @@ static int tas5805m_i2c_remove(struct i2c_client *i2c)
             gpiod_set_value(tas5805m->gpio_bias_monitor, 0);
         if (tas5805m->gpio_pdn_n)
             gpiod_set_value(tas5805m->gpio_pdn_n, 0);
-		if (tas5805m->pvdd)
+        if (tas5805m->pvdd)
             regulator_disable(tas5805m->pvdd);
         usleep_range(10000, 15000);
 #if LINUX_VERSION_CODE < KERNEL_VERSION(6, 3, 0)
