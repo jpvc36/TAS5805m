@@ -552,7 +552,8 @@ static int tas5805m_i2c_probe(struct i2c_client *i2c)
 	}
 
 	usleep_range(100000, 150000);
-	gpiod_set_value(tas5805m->gpio_pdn_n, 1);
+	if (tas5805m->gpio_pdn_n)
+        gpiod_set_value(tas5805m->gpio_pdn_n, 1);
 	usleep_range(10000, 15000);
 
 	INIT_WORK(&tas5805m->work, do_work);
@@ -565,7 +566,8 @@ static int tas5805m_i2c_probe(struct i2c_client *i2c)
 					 &tas5805m_dai, 1);
 	if (ret < 0) {
 		dev_err(dev, "unable to register codec: %d\n", ret);
-		gpiod_set_value(tas5805m->gpio_pdn_n, 0);
+		if (tas5805m->gpio_pdn_n)
+            gpiod_set_value(tas5805m->gpio_pdn_n, 0);
 		regulator_disable(tas5805m->pvdd);
 		return ret;
 	}
@@ -584,8 +586,10 @@ static int tas5805m_i2c_remove(struct i2c_client *i2c)
 
         cancel_work_sync(&tas5805m->work);
         snd_soc_unregister_component(dev);
-        gpiod_set_value(tas5805m->gpio_pdn_n, 0);
-        gpiod_set_value(tas5805m->gpio_bias_monitor, 0);
+        if (tas5805m->gpio_pdn_n)
+            gpiod_set_value(tas5805m->gpio_pdn_n, 0);
+        if (tas5805m->gpio_bias_monitor)
+            gpiod_set_value(tas5805m->gpio_bias_monitor, 0);
         usleep_range(10000, 15000);
         regulator_disable(tas5805m->pvdd);
 #if LINUX_VERSION_CODE < KERNEL_VERSION(6, 3, 0)
