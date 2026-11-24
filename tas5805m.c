@@ -566,7 +566,7 @@ static int tas5805m_i2c_probe(struct i2c_client *i2c)
 		if (tas5805m->gpio_pdn_n)
             gpiod_set_value(tas5805m->gpio_pdn_n, 0);
 		if (tas5805m->pvdd)
-            regulator_disable(tas5805m->pvdd)
+            regulator_disable(tas5805m->pvdd);
 		return ret;
 	}
 
