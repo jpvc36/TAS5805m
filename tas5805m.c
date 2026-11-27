@@ -573,11 +573,11 @@ static int tas5805m_i2c_probe(struct i2c_client *i2c)
 	return 0;
 }
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+// #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
 static void tas5805m_i2c_remove(struct i2c_client *i2c)
-#else
-static int tas5805m_i2c_remove(struct i2c_client *i2c)
-#endif
+// #else
+// static int tas5805m_i2c_remove(struct i2c_client *i2c)
+// #endif
 {
         struct device *dev = &i2c->dev;
         struct tas5805m_priv *tas5805m = dev_get_drvdata(dev);
@@ -591,8 +591,8 @@ static int tas5805m_i2c_remove(struct i2c_client *i2c)
         if (tas5805m->pvdd)
             regulator_disable(tas5805m->pvdd);
         usleep_range(10000, 15000);
-#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 3, 0)
-        return 0;
+// #if LINUX_VERSION_CODE < KERNEL_VERSION(6, 3, 0)
+//        return 0;
 #endif
 }
 
@@ -611,11 +611,11 @@ MODULE_DEVICE_TABLE(of, tas5805m_of_match);
 #endif
 
 static struct i2c_driver tas5805m_i2c_driver = {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+//#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
         .probe = tas5805m_i2c_probe,
-#else
-        .probe_new = tas5805m_i2c_probe,
-#endif
+// #else
+//        .probe_new = tas5805m_i2c_probe,
+// #endif
 	.remove		= tas5805m_i2c_remove,
 	.id_table	= tas5805m_i2c_id,
 	.driver		= {
